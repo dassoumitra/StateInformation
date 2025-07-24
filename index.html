@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Indian States</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --text-color: #1f2937;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .state-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .dropdown {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .dropdown-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-btn:hover {
+            background-color: #f1f5f9;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            display: none;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--bg-color);
+        }
+
+        .state-info {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .state-info.active {
+            display: block;
+        }
+
+        .state-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .state-name {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .state-tagline {
+            font-size: 1.1rem;
+            color: #64748b;
+            max-width: 700px;
+        }
+
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-content {
+            color: var(--text-color);
+        }
+
+        .card-content ul {
+            padding-left: 1.5rem;
+        }
+
+        .card-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .map-container {
+            grid-column: span 2;
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .map-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        footer {
+            background-color: var(--text-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .state-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                grid-column: span 1;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Explore Indian States</h1>
+            <p class="tagline">Discover the rich diversity of India's states and union territories</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="state-selector">
+            <div class="dropdown">
+                <button class="dropdown-btn" id="dropdownBtn">
+                    <span>Select a State/UT</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-content" id="dropdownContent">
+                    <!-- States will be added dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Default placeholder for state selection -->
+        <div id="placeholder" style="text-align: center; padding: 2rem; color: #64748b;">
+            <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h2>Select a State/UT to Explore</h2>
+            <p>Choose from the dropdown menu to view detailed information about any Indian state</p>
+        </div>
+
+        <!-- State information sections will be added dynamically -->
+        <div id="stateContainer"></div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Indian States Explorer. All rights reserved by Soumitra Das.</p>
+            <p>Data sources: Government of India, Census 2011</p>
+        </div>
+    </footer>
+
+    <script>
+        // Indian states data with all requested information
+        const statesData = [
+            {
+                name: "Andhra Pradesh",
+                capital: "Amaravati",
+                cm: "Y. S. Jagan Mohan Reddy",
+                tourism: ["Tirupati Temple", "Araku Valley", "Visakhapatnam Beaches", "Lepakshi Temple"],
+                rivers: ["Godavari", "Krishna", "Tungabhadra", "Penna"],
+                population: "49,386,799 (2011)",
+                motherTongue: "Telugu",
+                map: "https://placehold.co/800x400?text=Map+of+Andhra+Pradesh",
+                tagline: "The Kohinoor of India"
+            },
+            {
+                name: "Arunachal Pradesh",
+                capital: "Itanagar",
+                cm: "Pema Khandu",
+                tourism: ["Tawang Monastery", "Ziro Valley", "Namdapha National Park", "Sela Pass"],
+                rivers: ["Siang", "Subansiri", "Kameng", "Dibang"],
+                population: "1,383,727 (2011)",
+                motherTongue: "Various tribal languages",
+                map: "https://placehold.co/800x400?text=Map+of+Arunachal+Pradesh",
+                tagline: "Land of the Dawn-Lit Mountains"
+            },
+            {
+                name: "Assam",
+                capital: "Dispur",
+                cm: "Himanta Biswa Sarma",
+                tourism: ["Kaziranga National Park", "Kamakhya Temple", "Majuli Island", "Manas National Park"],
+                rivers: ["Brahmaputra", "Barak", "Manas", "Subansiri"],
+                population: "31,169,272 (2011)",
+                motherTongue: "Assamese",
+                map: "https://placehold.co/800x400?text=Map+of+Assam",
+                tagline: "Gateway to North-East India"
+            },
+            {
+                name: "Bihar",
+                capital: "Patna",
+                cm: "Nitish Kumar",
+                tourism: ["Bodh Gaya", "Nalanda University", "Vaishali", "Pawapuri"],
+                rivers: ["Ganga", "Sone", "Gandak", "Kosi"],
+                population: "104,099,452 (2011)",
+                motherTongue: "Hindi, Maithili",
+                map: "https://placehold.co/800x400?text=Map+of+Bihar",
+                tagline: "The Land of Enlightenment"
+            },
+            {
+                name: "Chhattisgarh",
+                capital: "Raipur",
+                cm: "Bhupesh Baghel",
+                tourism: ["Chitrakote Falls", "Bastar", "Sirpur", "Barnawapara Wildlife Sanctuary"],
+                rivers: ["Mahanadi", "Indravati", "Sheonath", "Hasdeo"],
+                population: "25,545,198 (2011)",
+                motherTongue: "Chhattisgarhi",
+                map: "https://placehold.co/800x400?text=Map+of+Chhattisgarh",
+                tagline: "Rice Bowl of India"
+            },
+            {
+                name: "Goa",
+                capital: "Panaji",
+                cm: "Pramod Sawant",
+                tourism: ["Calangute Beach", "Old Goa Churches", "Dudhsagar Falls", "Fort Aguada"],
+                rivers: ["Mandovi", "Zuari", "Chapora", "Sal"],
+                population: "1,458,545 (2011)",
+                motherTongue: "Konkani",
+                map: "https://placehold.co/800x400?text=Map+of+Goa",
+                tagline: "Pearl of the Orient"
+            },
+            {
+                name: "Gujarat",
+                capital: "Gandhinagar",
+                cm: "Bhupendrabhai Patel",
+                tourism: ["Statue of Unity", "Somnath Temple", "Rann of Kutch", "Gir National Park"],
+                rivers: ["Sabarmati", "Narmada", "Tapi", "Mahi"],
+                population: "60,439,692 (2011)",
+                motherTongue: "Gujarati",
+                map: "https://placehold.co/800x400?text=Map+of+Gujarat",
+                tagline: "Jewel of Western India"
+            },
+            {
+                name: "Haryana",
+                capital: "Chandigarh",
+                cm: "Manohar Lal Khattar",
+                tourism: ["Kurukshetra", "Sultanpur National Park", "Pinjore Gardens", "Badkhal Lake"],
+                rivers: ["Yamuna", "Ghaggar"],
+                population: "25,351,462 (2011)",
+                motherTongue: "Hindi",
+                map: "https://placehold.co/800x400?text=Map+of+Haryana",
+                tagline: "The Home of Roti and Swad"
+            },
+            {
+                name: "Himachal Pradesh",
+                capital: "Shimla",
+                cm: "Sukhvinder Singh Sukhu",
+                tourism: ["Shimla", "Manali", "Dharamshala", "Spiti Valley"],
+                rivers: ["Beas", "Chenab", "Ravi", "Sutlej"],
+                population: "6,864,602 (2011)",
+                motherTongue: "Hindi, Pahari",
+                map: "https://placehold.co/800x400?text=Map+of+Himachal+Pradesh",
+                tagline: "Land of Gods"
+            },
+            {
+                name: "Jharkhand",
+                capital: "Ranchi",
+                cm: "Hemant Soren",
+                tourism: ["Jagannath Temple", "Dassam Falls", "Betla National Park", "Hazaribagh Wildlife Sanctuary"],
+                rivers: ["Damodar", "Subarnarekha", "Koel", "Sankh"],
+                population: "32,988,134 (2011)",
+                motherTongue: "Hindi, Santhali",
+                map: "https://placehold.co/800x400?text=Map+of+Jharkhand",
+                tagline: "The Land of Forests"
+            },
+            {
+                name: "Karnataka",
+                capital: "Bengaluru",
+                cm: "Siddaramaiah",
+                tourism: ["Mysore Palace", "Hampi", "Coorg", "Jog Falls"],
+                rivers: ["Kaveri", "Krishna", "Tungabhadra", "Sharavathi"],
+                population: "61,095,297 (2011)",
+                motherTongue: "Kannada",
+                map: "https://placehold.co/800x400?text=Map+of+Karnataka",
+                tagline: "One State, Many Worlds"
+            },
+            {
+                name: "Kerala",
+                capital: "Thiruvananthapuram",
+                cm: "Pinarayi Vijayan",
+                tourism: ["Backwaters of Alleppey", "Munnar", "Fort Kochi", "Kovalam Beach"],
+                rivers: ["Periyar", "Pamba", "Bharathapuzha", "Chaliyar"],
+                population: "33,406,061 (2011)",
+                motherTongue: "Malayalam",
+                map: "https://placehold.co/800x400?text=Map+of+Kerala",
+                tagline: "God's Own Country"
+            },
+            {
+                name: "Madhya Pradesh",
+                capital: "Bhopal",
+                cm: "Shivraj Singh Chouhan",
+                tourism: ["Khajuraho Temples", "Sanchi Stupa", "Kanha National Park", "Pachmarhi"],
+                rivers: ["Narmada", "Chambal", "Betwa", "Son"],
+                population: "72,626,809 (2011)",
+                motherTongue: "Hindi",
+                map: "https://placehold.co/800x400?text=Map+of+Madhya+Pradesh",
+                tagline: "Heart of India"
+            },
+            {
+                name: "Maharashtra",
+                capital: "Mumbai",
+                cm: "Eknath Shinde",
+                tourism: ["Gateway of India", "Ajanta-Ellora Caves", "Lonavala", "Tadoba National Park"],
+                rivers: ["Godavari", "Krishna", "Tapi", "Bhima"],
+                population: "112,374,333 (2011)",
+                motherTongue: "Marathi",
+                map: "https://placehold.co/800x400?text=Map+of+Maharashtra",
+                tagline: "The Land of Legends"
+            },
+            {
+                name: "Manipur",
+                capital: "Imphal",
+                cm: "N. Biren Singh",
+                tourism: ["Loktak Lake", "Kangla Fort", "Shirui Hills", "Khongjom War Memorial"],
+                rivers: ["Manipur", "Barak", "Imphal", "Thoubal"],
+                population: "2,855,794 (2011)",
+                motherTongue: "Manipuri",
+                map: "https://placehold.co/800x400?text=Map+of+Manipur",
+                tagline: "Jewel of India"
+            },
+            {
+                name: "Meghalaya",
+                capital: "Shillong",
+                cm: "Conrad Sangma",
+                tourism: ["Cherrapunji", "Dawki River", "Living Root Bridges", "Mawlynnong Village"],
+                rivers: ["Simsang", "Umiam", "Kynshi", "Daring"],
+                population: "2,966,889 (2011)",
+                motherTongue: "Khasi, Garo",
+                map: "https://placehold.co/800x400?text=Map+of+Meghalaya",
+                tagline: "Abode of Clouds"
+            },
+            {
+                name: "Mizoram",
+                capital: "Aizawl",
+                cm: "Zoramthanga",
+                tourism: ["Reiek Mountain", "Phawngpui Peak", "Tamdil Lake", "Vantawng Falls"],
+                rivers: ["Tlawng", "Chhimtuipui", "Khawthlangtuipui", "Tuivawl"],
+                population: "1,097,206 (2011)",
+                motherTongue: "Mizo",
+                map: "https://placehold.co/800x400?text=Map+of+Mizoram",
+                tagline: "Land of the Mizos"
+            },
+            {
+                name: "Nagaland",
+                capital: "Kohima",
+                cm: "Neiphiu Rio",
+                tourism: ["Dzukou Valley", "Khonoma Village", "Japfu Peak", "Naga Heritage Village"],
+                rivers: ["Dhansiri", "Doyang", "Zungki", "Milak"],
+                population: "1,978,502 (2011)",
+                motherTongue: "Various Naga languages",
+                map: "https://placehold.co/800x400?text=Map+of+Nagaland",
+                tagline: "Land of Festivals"
+            },
+            {
+                name: "Odisha",
+                capital: "Bhubaneswar",
+                cm: "Naveen Patnaik",
+                tourism: ["Konark Sun Temple", "Puri Jagannath Temple", "Chilika Lake", "Daringbadi"],
+                rivers: ["Mahanadi", "Brahmani", "Baitarani", "Subarnarekha"],
+                population: "41,974,218 (2011)",
+                motherTongue: "Odia",
+                map: "https://placehold.co/800x400?text=Map+of+Odisha",
+                tagline: "Soul of Incredible India"
+            },
+            {
+                name: "Punjab",
+                capital: "Chandigarh",
+                cm: "Bhagwant Mann",
+                tourism: ["Golden Temple", "Jallianwala Bagh", "Wagah Border", "Anandpur Sahib"],
+                rivers: ["Sutlej", "Beas", "Ravi", "Ghaggar"],
+                population: "27,743,338 (2011)",
+                motherTongue: "Punjabi",
+                map: "https://placehold.co/800x400?text=Map+of+Punjab",
+                tagline: "Land of Five Rivers"
+            },
+            {
+                name: "Rajasthan",
+                capital: "Jaipur",
+                cm: "Ashok Gehlot",
+                tourism: ["Amber Fort", "Jaipur City Palace", "Udaipur Lake Palace", "Jaisalmer Desert"],
+                rivers: ["Chambal", "Banas", "Luni", "Gambhiri"],
+                population: "68,548,437 (2011)",
+                motherTongue: "Hindi, Rajasthani",
+                map: "https://placehold.co/800x400?text=Map+of+Rajasthan",
+                tagline: "Land of Kings"
+            },
+            {
+                name: "Sikkim",
+                capital: "Gangtok",
+                cm: "Prem Singh Tamang",
+                tourism: ["Tsomgo Lake", "Nathula Pass", "Yumthang Valley", "Gurudongmar Lake"],
+                rivers: ["Teesta", "Rangit", "Lachung", "Lhonak"],
+                population: "610,577 (2011)",
+                motherTongue: "Nepali, Sikkimese",
+                map: "https://placehold.co/800x400?text=Map+of+Sikkim",
+                tagline: "Land of Mystic Splendour"
+            },
+            {
+                name: "Tamil Nadu",
+                capital: "Chennai",
+                cm: "M. K. Stalin",
+                tourism: ["Meenakshi Temple", "Mahabalipuram", "Ooty", "Kanyakumari"],
+                rivers: ["Cauvery", "Vaigai", "Thamirabarani", "Palar"],
+                population: "72,147,030 (2011)",
+                motherTongue: "Tamil",
+                map: "https://placehold.co/800x400?text=Map+of+Tamil+Nadu",
+                tagline: "Land of Temples"
+            },
+            {
+                name: "Telangana",
+                capital: "Hyderabad",
+                cm: "K. Chandrashekar Rao",
+                tourism: ["Charminar", "Golconda Fort", "Ramappa Temple", "Nagarjuna Sagar"],
+                rivers: ["Godavari", "Krishna", "Manjira", "Musi"],
+                population: "35,193,978 (2011)",
+                motherTongue: "Telugu",
+                map: "https://placehold.co/800x400?text=Map+of+Telangana",
+                tagline: "Newest Gem of India"
+            },
+            {
+                name: "Tripura",
+                capital: "Agartala",
+                cm: "Manik Saha",
+                tourism: ["Neermahal", "Ujjayanta Palace", "Sepahijala Wildlife Sanctuary", "Unakoti"],
+                rivers: ["Gomati", "Manu", "Howrah", "Khowai"],
+                population: "3,673,917 (2011)",
+                motherTongue: "Bengali, Kokborok",
+                map: "https://placehold.co/800x400?text=Map+of+Tripura",
+                tagline: "Land of Diversity"
+            },
+            {
+                name: "Uttar Pradesh",
+                capital: "Lucknow",
+                cm: "Yogi Adityanath",
+                tourism: ["Taj Mahal", "Varanasi Ghats", "Agra Fort", "Ayodhya"],
+                rivers: ["Ganga", "Yamuna", "Ghaghara", "Ramganga"],
+                population: "199,812,341 (2011)",
+                motherTongue: "Hindi",
+                map: "https://placehold.co/800x400?text=Map+of+Uttar+Pradesh",
+                tagline: "Heartland of India"
+            },
+            {
+                name: "Uttarakhand",
+                capital: "Dehradun",
+                cm: "Pushkar Singh Dhami",
+                tourism: ["Rishikesh", "Char Dham", "Valley of Flowers", "Mussoorie"],
+                rivers: ["Ganga", "Yamuna", "Alaknanda", "Bhagirathi"],
+                population: "10,086,292 (2011)",
+                motherTongue: "Hindi, Garhwali, Kumaoni",
+                map: "https://placehold.co/800x400?text=Map+of+Uttarakhand",
+                tagline: "Dev Bhoomi (Land of Gods)"
+            },
+            {
+                name: "West Bengal",
+                capital: "Kolkata",
+                cm: "Mamata Banerjee",
+                tourism: ["Sundarbans", "Darjeeling", "Victoria Memorial", "Kalimpong"],
+                rivers: ["Hooghly", "Damodar", "Teesta", "Mahananda"],
+                population: "91,276,115 (2011)",
+                motherTongue: "Bengali",
+                map: "https://placehold.co/800x400?text=Map+of+West+Bengal",
+                tagline: "The Sweetest Part of India"
+            },
+            // Union Territories
+            {
+                name: "Andaman and Nicobar Islands",
+                capital: "Port Blair",
+                cm: "Admiral D K Joshi (LG)",
+                tourism: ["Cellular Jail", "Radhanagar Beach", "Havelock Island", "Barren Island"],
+                rivers: ["NA"],
+                population: "380,581 (2011)",
+                motherTongue: "Bengali, Hindi, Tamil, Telugu",
+                map: "https://placehold.co/800x400?text=Map+of+Andaman+and+Nicobar+Islands",
+                tagline: "India's Tropical Paradise"
+            },
+            {
+                name: "Chandigarh",
+                capital: "Chandigarh",
+                cm: "Banwarilal Purohit (LG)",
+                tourism: ["Rock Garden", "Sukhna Lake", "Rose Garden", "Capitol Complex"],
+                rivers: ["NA"],
+                population: "1,055,450 (2011)",
+                motherTongue: "Hindi, Punjabi",
+                map: "https://placehold.co/800x400?text=Map+of+Chandigarh",
+                tagline: "The City Beautiful"
+            },
+            {
+                name: "Dadra and Nagar Haveli and Daman and Diu",
+                capital: "Daman",
+                cm: "Praful Patel (LG)",
+                tourism: ["Diu Fort", "Nani Daman", "Jampore Beach", "Devka Beach"],
+                rivers: ["Daman Ganga"],
+                population: "585,764 (2011)",
+                motherTongue: "Gujarati, Hindi",
+                map: "https://placehold.co/800x400?text=Map+of+Dadra+and+Nagar+Haveli+and+Daman+and+Diu",
+                tagline: "Where Culture Meets Coast"
+            },
+            {
+                name: "Delhi",
+                capital: "New Delhi",
+                cm: "Arvind Kejriwal",
+                tourism: ["Red Fort", "Qutub Minar", "India Gate", "Lotus Temple"],
+                rivers: ["Yamuna"],
+                population: "16,787,941 (2011)",
+                motherTongue: "Hindi",
+                map: "https://placehold.co/800x400?text=Map+of+Delhi",
+                tagline: "Dilwalon ki Dilli"
+            },
+            {
+                name: "Jammu and Kashmir",
+                capital: "Srinagar (Summer), Jammu (Winter)",
+                cm: "Manoj Sinha (LG)",
+                tourism: ["Dal Lake", "Gulmarg", "Vaishno Devi", "Pahalgam"],
+                rivers: ["Jhelum", "Chenab", "Indus"],
+                population: "12,267,013 (2011)",
+                motherTongue: "Kashmiri, Dogri",
+                map: "https://placehold.co/800x400?text=Map+of+Jammu+and+Kashmir",
+                tagline: "Paradise on Earth"
+            },
+            {
+                name: "Ladakh",
+                capital: "Leh",
+                cm: "Radha Krishna Mathur (LG)",
+                tourism: ["Pangong Lake", "Nubra Valley", "Zanskar Valley", "Hemis Monastery"],
+                rivers: ["Indus", "Shyok"],
+                population: "290,492 (2011)",
+                motherTongue: "Ladakhi, Balti",
+                map: "https://placehold.co/800x400?text=Map+of+Ladakh",
+                tagline: "The Land of High Passes"
+            },
+            {
+                name: "Lakshadweep",
+                capital: "Kavaratti",
+                cm: "Praful Khoda Patel (LG)",
+                tourism: ["Agatti Island", "Kadmat Island", "Minicoy Island", "Bangaram Island"],
+                rivers: ["NA"],
+                population: "64,473 (2011)",
+                motherTongue: "Malayalam",
+                map: "https://placehold.co/800x400?text=Map+of+Lakshadweep",
+                tagline: "Coral Paradise of India"
+            },
+            {
+                name: "Puducherry",
+                capital: "Puducherry",
+                cm: "Dr. Tamilisai Soundararajan (LG)",
+                tourism: ["Auroville", "Promenade Beach", "Paradise Beach", "Chunnambar Boat House"],
+                rivers: ["NA"],
+                population: "1,247,953 (2011)",
+                motherTongue: "Tamil, French",
+                map: "https://placehold.co/800x400?text=Map+of+Puducherry",
+                tagline: "The French Riviera of the East"
+            }
+        ];
+
+        // DOM elements
+        const dropdownBtn = document.getElementById('dropdownBtn');
+        const dropdownContent = document.getElementById('dropdownContent');
+        const stateContainer = document.getElementById('stateContainer');
+        const placeholder = document.getElementById('placeholder');
+
+        // Initialize dropdown with states
+        function initDropdown() {
+            // Sort states alphabetically
+            statesData.sort((a, b) => a.name.localeCompare(b.name));
+            
+            statesData.forEach(state => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = state.name;
+                item.addEventListener('click', () => selectState(state));
+                dropdownContent.appendChild(item);
+            });
+        }
+
+        // Toggle dropdown
+        dropdownBtn.addEventListener('click', () => {
+            dropdownContent.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', (e) => {
+            if (!e.target.matches('.dropdown-btn') && !e.target.closest('.dropdown-content')) {
+                dropdownContent.classList.remove('show');
+            }
+        });
+
+        // Select a state and display its information
+        function selectState(state) {
+            dropdownBtn.querySelector('span').textContent = state.name;
+            dropdownContent.classList.remove('show');
+            placeholder.style.display = 'none';
+            
+            // Create state info HTML
+            const stateInfo = document.createElement('div');
+            stateInfo.className = 'state-info active';
+            stateInfo.innerHTML = `
+                <div class="state-header">
+                    <h2 class="state-name">${state.name}</h2>
+                    <p class="state-tagline">${state.tagline}</p>
+                </div>
+                
+                <div class="state-grid">
+                    <div class="info-card">
+                        <h3 class="card-title"><i class="fas fa-city"></i> Capital</h3>
+                        <p class="card-content">${state.capital}</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title"><i class="fas fa-user-tie"></i> Chief Minister</h3>
+                        <p class="card-content">${state.cm}</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title"><i class="fas fa-users"></i> Population</h3>
+                        <p class="card-content">${state.population}</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title"><i class="fas fa-language"></i> Mother Tongue</h3>
+                        <p class="card-content">${state.motherTongue}</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title"><i class="fas fa-water"></i> Major Rivers</h3>
+                        <div class="card-content">
+                            <ul>
+                                ${state.rivers.map(river => `<li>${river}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3 class="card-title"><i class="fas fa-umbrella-beach"></i> Tourism Places</h3>
+                        <div class="card-content">
+                            <ul>
+                                ${state.tourism.map(place => `<li>${place}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="map-container info-card">
+                        <h3 class="card-title"><i class="fas fa-map"></i> Map</h3>
+                        <img src="${state.map}" alt="Map of ${state.name}" class="map-image" />
+                    </div>
+                </div>
+            `;
+            
+            // Clear previous state info and add new one
+            stateContainer.innerHTML = '';
+            stateContainer.appendChild(stateInfo);
+            
+            // Scroll to the state info
+            stateInfo.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize the dropdown menu
+        initDropdown();
+    </script>
+</body>
+</html>
